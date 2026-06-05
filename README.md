@@ -2,6 +2,14 @@
 
 PowerSound is a simple Windows 11 C#/.NET tray app that plays one sound when AC power is connected and another sound when AC power is disconnected.
 
+## Download
+
+Download the latest release from:
+
+https://github.com/Jacob-Hack/PowerSound/releases
+
+Choose `PowerSound-for-Windows.zip`, unzip it, and run `PowerSound.exe`.
+
 ## Features
 
 - Runs as a tray app.
