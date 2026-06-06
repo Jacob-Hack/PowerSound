@@ -8,7 +8,11 @@ Download the latest release from:
 
 https://github.com/Jacob-Hack/PowerSound/releases
 
-Choose `PowerSound-for-Windows.zip`, unzip it, and run `PowerSound.exe`.
+Most people should download `PowerSound-Setup.exe` and run it.
+
+For portable use, download `PowerSound-for-Windows.zip`, unzip it, and run `PowerSound.exe`.
+
+Windows may show a SmartScreen warning because PowerSound is not code-signed.
 
 ## Features
 
@@ -39,6 +43,13 @@ The self-contained build does not require the .NET runtime or SDK on the target 
 
 ```text
 bin\Release\net8.0-windows\win-x64\publish
+```
+
+To build the installer:
+
+```powershell
+dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:DebugType=None /p:DebugSymbols=false -o Installer\Payload
+dotnet publish Installer\PowerSound.Installer.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:DebugType=None /p:DebugSymbols=false
 ```
 
 ## Use

@@ -5,15 +5,12 @@
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
-    <AssemblyName>PowerSound</AssemblyName>
-    <RootNamespace>PowerSound</RootNamespace>
+    <AssemblyName>PowerSound-Setup</AssemblyName>
+    <RootNamespace>PowerSound.Installer</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Installer\**\*.cs" />
-    <EmbeddedResource Remove="Installer\**\*" />
-    <None Remove="Installer\**\*" />
+    <EmbeddedResource Include="Payload\PowerSound.exe" LogicalName="PowerSound.exe" Condition="Exists('Payload\PowerSound.exe')" />
   </ItemGroup>
 </Project>
