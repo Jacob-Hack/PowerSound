@@ -5,4 +5,5 @@ obj/
 *.pdb
 .vs/
 publish/
+artifacts/
 Installer/Payload/

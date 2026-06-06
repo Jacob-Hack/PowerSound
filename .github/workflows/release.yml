@@ -1,0 +1,91 @@
+name: Build release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version, for example v0.1.1"
+        required: true
+        default: "v0.1.1"
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Windows release
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set version
+        shell: pwsh
+        run: |
+          $version = "${{ github.event.inputs.version }}"
+          if (-not $version) {
+            $version = "${{ github.ref_name }}"
+          }
+          $plainVersion = $version.TrimStart("v")
+          "RELEASE_VERSION=$version" >> $env:GITHUB_ENV
+          "POWERSOUND_VERSION=$plainVersion" >> $env:GITHUB_ENV
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Publish PowerSound
+        shell: pwsh
+        run: |
+          dotnet publish PowerSound.csproj `
+            -c Release `
+            -r win-x64 `
+            --self-contained true `
+            /p:PublishSingleFile=true `
+            /p:IncludeNativeLibrariesForSelfExtract=true `
+            /p:DebugType=None `
+            /p:DebugSymbols=false `
+            -o publish/win-x64
+
+      - name: Create portable ZIP
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path artifacts | Out-Null
+          Compress-Archive -Path publish/win-x64/PowerSound.exe -DestinationPath artifacts/PowerSound-for-Windows.zip -Force
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup --yes --no-progress
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" Installer/PowerSound.iss
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: PowerSound-windows
+          path: |
+            artifacts/PowerSound-Setup.exe
+            artifacts/PowerSound-for-Windows.zip
+
+      - name: Create or update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_VERSION }}
+          name: PowerSound ${{ env.RELEASE_VERSION }}
+          body: |
+            Recommended: download `PowerSound-Setup.exe` and run it.
+
+            Portable option: download `PowerSound-for-Windows.zip`, unzip it, and run `PowerSound.exe`.
+
+            No .NET SDK or runtime install is needed for either option. Windows may show a SmartScreen warning because PowerSound is not code-signed.
+          files: |
+            artifacts/PowerSound-Setup.exe
+            artifacts/PowerSound-for-Windows.zip

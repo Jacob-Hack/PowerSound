@@ -13,7 +13,5 @@
 
   <ItemGroup>
     <Compile Remove="Installer\**\*.cs" />
-    <EmbeddedResource Remove="Installer\**\*" />
-    <None Remove="Installer\**\*" />
   </ItemGroup>
 </Project>

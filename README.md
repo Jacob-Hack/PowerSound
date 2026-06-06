@@ -45,12 +45,14 @@ The self-contained build does not require the .NET runtime or SDK on the target 
 bin\Release\net8.0-windows\win-x64\publish
 ```
 
-To build the installer:
+To build the Inno Setup installer locally, install Inno Setup 6, publish the app, then compile `Installer\PowerSound.iss`:
 
 ```powershell
-dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:DebugType=None /p:DebugSymbols=false -o Installer\Payload
-dotnet publish Installer\PowerSound.Installer.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:DebugType=None /p:DebugSymbols=false
+dotnet publish PowerSound.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:DebugType=None /p:DebugSymbols=false -o publish\win-x64
+iscc Installer\PowerSound.iss
 ```
+
+GitHub Actions can also build the installer and portable ZIP automatically from the **Build release** workflow.
 
 ## Use
 
