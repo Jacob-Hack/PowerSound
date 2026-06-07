@@ -10,11 +10,13 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
     private readonly PowerSoundSettings settings;
     private readonly SoundService soundService;
     private SettingsForm? settingsForm;
+    private PowerLineStatus lastPowerLineStatus;
 
     public PowerSoundApplicationContext()
     {
         settings = SettingsStore.Load();
         soundService = new SoundService(settings);
+        lastPowerLineStatus = SystemInformation.PowerStatus.PowerLineStatus;
 
         notifyIcon = new NotifyIcon
         {
@@ -46,7 +48,15 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
             return;
         }
 
-        switch (SystemInformation.PowerStatus.PowerLineStatus)
+        var currentPowerLineStatus = SystemInformation.PowerStatus.PowerLineStatus;
+        if (currentPowerLineStatus == lastPowerLineStatus)
+        {
+            return;
+        }
+
+        lastPowerLineStatus = currentPowerLineStatus;
+
+        switch (currentPowerLineStatus)
         {
             case PowerLineStatus.Online:
                 soundService.PlayConnectedSound();
@@ -65,12 +75,8 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
             return;
         }
 
-        settingsForm = new SettingsForm(settings, soundService);
-        settingsForm.FormClosed += (_, _) =>
-        {
-            SettingsStore.Save(settings);
-            StartupManager.SetStartWithWindows(settings.StartWithWindows);
-        };
+        settingsForm = new SettingsForm(settings);
+        settingsForm.FormClosed += (_, _) => settingsForm = null;
         settingsForm.Show();
     }
 
