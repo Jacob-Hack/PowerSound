@@ -24,13 +24,13 @@ internal sealed class SoundService
             if (!string.IsNullOrWhiteSpace(customPath) && File.Exists(customPath))
             {
                 using var player = new SoundPlayer(customPath);
-                player.Play();
+                player.PlaySync();
                 return;
             }
 
             using var stream = new MemoryStream(defaultSound);
             using var defaultPlayer = new SoundPlayer(stream);
-            defaultPlayer.Play();
+            defaultPlayer.PlaySync();
         }
         catch
         {
