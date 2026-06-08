@@ -6,15 +6,17 @@ namespace PowerSound;
 internal sealed class SettingsForm : Form
 {
     private readonly PowerSoundSettings settings;
-    private readonly SoundService soundService;
+    private readonly PowerSoundSettings editSettings;
+    private readonly SoundService previewSoundService;
     private readonly TextBox connectedPathTextBox = new();
     private readonly TextBox disconnectedPathTextBox = new();
     private readonly CheckBox startWithWindowsCheckBox = new();
 
-    public SettingsForm(PowerSoundSettings settings, SoundService soundService)
+    public SettingsForm(PowerSoundSettings settings)
     {
         this.settings = settings;
-        this.soundService = soundService;
+        editSettings = settings.Copy();
+        previewSoundService = new SoundService(editSettings);
 
         Text = "PowerSound Settings";
         StartPosition = FormStartPosition.CenterScreen;
@@ -135,9 +137,9 @@ internal sealed class SettingsForm : Form
 
     private void LoadValues()
     {
-        connectedPathTextBox.Text = settings.ConnectedSoundPath;
-        disconnectedPathTextBox.Text = settings.DisconnectedSoundPath;
-        startWithWindowsCheckBox.Checked = settings.StartWithWindows;
+        connectedPathTextBox.Text = editSettings.ConnectedSoundPath;
+        disconnectedPathTextBox.Text = editSettings.DisconnectedSoundPath;
+        startWithWindowsCheckBox.Checked = editSettings.StartWithWindows;
     }
 
     private void BrowseConnectedSound(object? sender, EventArgs e)
@@ -173,28 +175,29 @@ internal sealed class SettingsForm : Form
 
     private void TestConnectedSound(object? sender, EventArgs e)
     {
-        ApplyValues();
-        soundService.PlayConnectedSound();
+        ApplyValues(editSettings);
+        previewSoundService.PlayConnectedSound();
     }
 
     private void TestDisconnectedSound(object? sender, EventArgs e)
     {
-        ApplyValues();
-        soundService.PlayDisconnectedSound();
+        ApplyValues(editSettings);
+        previewSoundService.PlayDisconnectedSound();
     }
 
     private void SaveAndClose()
     {
-        ApplyValues();
+        ApplyValues(editSettings);
+        settings.CopyFrom(editSettings);
         SettingsStore.Save(settings);
         StartupManager.SetStartWithWindows(settings.StartWithWindows);
         Close();
     }
 
-    private void ApplyValues()
+    private void ApplyValues(PowerSoundSettings target)
     {
-        settings.ConnectedSoundPath = connectedPathTextBox.Text.Trim();
-        settings.DisconnectedSoundPath = disconnectedPathTextBox.Text.Trim();
-        settings.StartWithWindows = startWithWindowsCheckBox.Checked;
+        target.ConnectedSoundPath = connectedPathTextBox.Text.Trim();
+        target.DisconnectedSoundPath = disconnectedPathTextBox.Text.Trim();
+        target.StartWithWindows = startWithWindowsCheckBox.Checked;
     }
 }
