@@ -4,6 +4,10 @@ internal static class DefaultSounds
 {
     public static byte[] Connected => CreateTone(660, 120, 0.35);
     public static byte[] Disconnected => CreateTone(330, 180, 0.35);
+    public static byte[] BatteryLow => CreateTone(523, 160, 0.35);
+    public static byte[] BatteryCritical => CreateTone(392, 220, 0.35);
+    public static byte[] BatteryEmergency => CreateTone(262, 300, 0.45);
+    public static byte[] BatteryFullyCharged => CreateTone(784, 180, 0.35);
 
     private static byte[] CreateTone(double frequency, int durationMilliseconds, double volume)
     {

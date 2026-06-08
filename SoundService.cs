@@ -12,12 +12,23 @@ internal sealed class SoundService
     }
 
     public void PlayConnectedSound() =>
-        Play(settings.ConnectedSoundPath, DefaultSounds.Connected);
+        PlayAsync(settings.ConnectedSoundPath, DefaultSounds.Connected);
 
     public void PlayDisconnectedSound() =>
-        Play(settings.DisconnectedSoundPath, DefaultSounds.Disconnected);
+        PlayAsync(settings.DisconnectedSoundPath, DefaultSounds.Disconnected);
 
-    private static void Play(string customPath, byte[] defaultSound)
+    public void PlayBatteryAlertSound(BatteryAlertKind kind)
+    {
+        var alertSettings = settings.GetBatteryAlert(kind);
+        PlayAsync(alertSettings.SoundPath, GetDefaultSound(kind));
+    }
+
+    private static void PlayAsync(string customPath, byte[] defaultSound)
+    {
+        _ = Task.Run(() => PlaySync(customPath, defaultSound));
+    }
+
+    private static void PlaySync(string customPath, byte[] defaultSound)
     {
         try
         {
@@ -37,4 +48,13 @@ internal sealed class SoundService
             SystemSounds.Beep.Play();
         }
     }
+
+    private static byte[] GetDefaultSound(BatteryAlertKind kind) => kind switch
+    {
+        BatteryAlertKind.Low => DefaultSounds.BatteryLow,
+        BatteryAlertKind.Critical => DefaultSounds.BatteryCritical,
+        BatteryAlertKind.Emergency => DefaultSounds.BatteryEmergency,
+        BatteryAlertKind.FullyCharged => DefaultSounds.BatteryFullyCharged,
+        _ => DefaultSounds.BatteryLow
+    };
 }

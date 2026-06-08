@@ -1,6 +1,6 @@
 # PowerSound
 
-PowerSound is a simple Windows 11 C#/.NET tray app that plays one sound when AC power is connected and another sound when AC power is disconnected.
+PowerSound is a simple Windows 11 C#/.NET tray app for power-related sounds and notifications.
 
 ## Download
 
@@ -18,12 +18,29 @@ Windows may show a SmartScreen warning because PowerSound is not code-signed.
 
 - Runs as a tray app.
 - Detects AC power connect and disconnect events.
+- Includes battery low, critical, emergency, and fully charged alerts.
+- Lets each battery alert play a sound, show a Windows notification, both, or neither.
+- Uses configurable battery thresholds for low, critical, and emergency alerts.
 - Includes two built-in default sounds.
 - Lets the user choose custom `.wav` files.
 - Includes test buttons for both sounds.
 - Saves settings to `%APPDATA%\PowerSound\settings.json`.
+- Copies selected custom sounds to `%APPDATA%\PowerSound\Sounds` so they keep working if the original file moves.
 - Can start automatically with Windows through the current user's Run registry key.
 - Uses standard Windows controls with labels, keyboard access keys, and accessibility names for screen readers.
+
+## Battery alerts
+
+PowerSound includes these battery alerts:
+
+- Battery Low: enabled by default at 20%.
+- Battery Critical: enabled by default at 10%.
+- Battery Emergency: enabled by default at 5%.
+- Battery Fully Charged: disabled by default and triggers at 100% while connected to AC power.
+
+Each battery alert can independently play a sound and show a Windows notification. Notifications are shown through the standard Windows notification area and follow Windows notification behavior, including Focus Assist / Do Not Disturb.
+
+Low, Critical, and Emergency alerts trigger once when the battery crosses down to the configured threshold. They reset after the battery rises above the configured threshold or AC power is connected. If Windows reports a large battery change, such as after waking from sleep below multiple thresholds, PowerSound shows only the most severe matching alert.
 
 ## Build
 

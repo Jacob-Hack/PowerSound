@@ -11,6 +11,7 @@ internal sealed class SettingsForm : Form
     private readonly TextBox connectedPathTextBox = new();
     private readonly TextBox disconnectedPathTextBox = new();
     private readonly CheckBox startWithWindowsCheckBox = new();
+    private readonly Dictionary<BatteryAlertKind, AlertControls> alertControls = [];
 
     public SettingsForm(PowerSoundSettings settings)
     {
@@ -20,12 +21,12 @@ internal sealed class SettingsForm : Form
 
         Text = "PowerSound Settings";
         StartPosition = FormStartPosition.CenterScreen;
-        MinimumSize = new Size(560, 360);
-        Size = new Size(640, 390);
+        MinimumSize = new Size(760, 560);
+        Size = new Size(840, 640);
         Font = SystemFonts.MessageBoxFont;
         AutoScaleMode = AutoScaleMode.Font;
         AccessibleName = "PowerSound settings";
-        AccessibleDescription = "Choose power sounds, test them, and set whether PowerSound starts with Windows.";
+        AccessibleDescription = "Choose power sounds, battery alerts, notifications, and startup behavior.";
 
         BuildUi();
         LoadValues();
@@ -33,12 +34,42 @@ internal sealed class SettingsForm : Form
 
     private void BuildUi()
     {
-        var layout = new TableLayoutPanel
+        var mainLayout = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
             Padding = new Padding(16),
+            ColumnCount = 1,
+            RowCount = 2
+        };
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+
+        var tabs = new TabControl
+        {
+            Dock = DockStyle.Fill,
+            AccessibleName = "Settings sections"
+        };
+        tabs.TabPages.Add(BuildGeneralTab());
+        tabs.TabPages.Add(BuildBatteryAlertsTab());
+        mainLayout.Controls.Add(tabs, 0, 0);
+
+        mainLayout.Controls.Add(BuildButtonPanel(), 0, 1);
+        Controls.Add(mainLayout);
+    }
+
+    private TabPage BuildGeneralTab()
+    {
+        var tab = new TabPage("General")
+        {
+            AccessibleName = "General settings"
+        };
+
+        var layout = new TableLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            Padding = new Padding(12),
             ColumnCount = 4,
-            RowCount = 6
+            RowCount = 4
         };
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 170));
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
@@ -55,11 +86,161 @@ internal sealed class SettingsForm : Form
         layout.Controls.Add(startWithWindowsCheckBox, 1, 3);
         layout.SetColumnSpan(startWithWindowsCheckBox, 3);
 
+        tab.Controls.Add(layout);
+        return tab;
+    }
+
+    private TabPage BuildBatteryAlertsTab()
+    {
+        var tab = new TabPage("Battery Alerts")
+        {
+            AccessibleName = "Battery Alerts settings"
+        };
+
+        var scrollPanel = new Panel
+        {
+            Dock = DockStyle.Fill,
+            AutoScroll = true
+        };
+
+        var layout = new TableLayoutPanel
+        {
+            Dock = DockStyle.Top,
+            AutoSize = true,
+            ColumnCount = 1,
+            RowCount = 4,
+            Padding = new Padding(8)
+        };
+
+        layout.Controls.Add(BuildAlertGroup(BatteryAlertKind.Low, "Battery Low", true), 0, 0);
+        layout.Controls.Add(BuildAlertGroup(BatteryAlertKind.Critical, "Battery Critical", true), 0, 1);
+        layout.Controls.Add(BuildAlertGroup(BatteryAlertKind.Emergency, "Battery Emergency", true), 0, 2);
+        layout.Controls.Add(BuildAlertGroup(BatteryAlertKind.FullyCharged, "Battery Fully Charged", false), 0, 3);
+
+        scrollPanel.Controls.Add(layout);
+        tab.Controls.Add(scrollPanel);
+        return tab;
+    }
+
+    private GroupBox BuildAlertGroup(BatteryAlertKind kind, string title, bool hasThreshold)
+    {
+        var controls = new AlertControls();
+        alertControls[kind] = controls;
+
+        var group = new GroupBox
+        {
+            Text = title,
+            Dock = DockStyle.Top,
+            AutoSize = true,
+            Padding = new Padding(12),
+            AccessibleName = title
+        };
+
+        var layout = new TableLayoutPanel
+        {
+            Dock = DockStyle.Top,
+            AutoSize = true,
+            ColumnCount = 4,
+            RowCount = 3
+        };
+        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 180));
+        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 110));
+        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 90));
+
+        controls.EnabledCheckBox.Text = "Enable alert";
+        controls.EnabledCheckBox.AutoSize = true;
+        controls.EnabledCheckBox.AccessibleName = $"Enable {title} alert";
+        layout.Controls.Add(controls.EnabledCheckBox, 0, 0);
+
+        controls.PlaySoundCheckBox.Text = "Play sound";
+        controls.PlaySoundCheckBox.AutoSize = true;
+        controls.PlaySoundCheckBox.AccessibleName = $"Play sound for {title}";
+        layout.Controls.Add(controls.PlaySoundCheckBox, 1, 0);
+
+        controls.ShowNotificationCheckBox.Text = "Show notification";
+        controls.ShowNotificationCheckBox.AutoSize = true;
+        controls.ShowNotificationCheckBox.AccessibleName = $"Show notification for {title}";
+        layout.Controls.Add(controls.ShowNotificationCheckBox, 2, 0);
+        layout.SetColumnSpan(controls.ShowNotificationCheckBox, 2);
+
+        if (hasThreshold)
+        {
+            var thresholdLabel = new Label
+            {
+                Text = "Threshold &percent",
+                AutoSize = true,
+                Anchor = AnchorStyles.Left,
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+            layout.Controls.Add(thresholdLabel, 0, 1);
+
+            controls.ThresholdNumericUpDown.Minimum = 1;
+            controls.ThresholdNumericUpDown.Maximum = 100;
+            controls.ThresholdNumericUpDown.Width = 80;
+            controls.ThresholdNumericUpDown.AccessibleName = $"{title} threshold percent";
+            controls.ThresholdNumericUpDown.AccessibleDescription = "Battery percentage at or below which this alert triggers.";
+            layout.Controls.Add(controls.ThresholdNumericUpDown, 1, 1);
+            thresholdLabel.Click += (_, _) => controls.ThresholdNumericUpDown.Focus();
+        }
+        else
+        {
+            var fullChargeLabel = new Label
+            {
+                Text = "Triggers at 100% while connected to AC power.",
+                AutoSize = true,
+                Anchor = AnchorStyles.Left,
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+            layout.Controls.Add(fullChargeLabel, 0, 1);
+            layout.SetColumnSpan(fullChargeLabel, 4);
+        }
+
+        var soundLabel = new Label
+        {
+            Text = "Sound file",
+            AutoSize = true,
+            Anchor = AnchorStyles.Left,
+            TextAlign = ContentAlignment.MiddleLeft
+        };
+        layout.Controls.Add(soundLabel, 0, 2);
+
+        controls.SoundPathTextBox.Dock = DockStyle.Fill;
+        controls.SoundPathTextBox.AccessibleName = $"{title} sound file";
+        controls.SoundPathTextBox.AccessibleDescription = "Leave blank to use the built-in default sound. Choose a WAV file for a custom sound.";
+        layout.Controls.Add(controls.SoundPathTextBox, 1, 2);
+        soundLabel.Click += (_, _) => controls.SoundPathTextBox.Focus();
+
+        var browseButton = new Button
+        {
+            Text = "&Browse...",
+            AutoSize = true,
+            Anchor = AnchorStyles.Left,
+            AccessibleName = $"Browse for {title} sound"
+        };
+        browseButton.Click += (_, _) => BrowseBatteryAlertSound(kind);
+        layout.Controls.Add(browseButton, 2, 2);
+
+        var testButton = new Button
+        {
+            Text = "&Test",
+            AutoSize = true,
+            Anchor = AnchorStyles.Left,
+            AccessibleName = $"Test {title} sound"
+        };
+        testButton.Click += (_, _) => TestBatteryAlertSound(kind);
+        layout.Controls.Add(testButton, 3, 2);
+
+        group.Controls.Add(layout);
+        return group;
+    }
+
+    private FlowLayoutPanel BuildButtonPanel()
+    {
         var saveButton = new Button
         {
             Text = "&Save",
             AutoSize = true,
-            Anchor = AnchorStyles.Right,
             DialogResult = DialogResult.OK,
             AccessibleName = "Save settings"
         };
@@ -69,7 +250,6 @@ internal sealed class SettingsForm : Form
         {
             Text = "Cancel",
             AutoSize = true,
-            Anchor = AnchorStyles.Left,
             DialogResult = DialogResult.Cancel,
             AccessibleName = "Cancel"
         };
@@ -83,12 +263,10 @@ internal sealed class SettingsForm : Form
         };
         buttonPanel.Controls.Add(saveButton);
         buttonPanel.Controls.Add(cancelButton);
-        layout.Controls.Add(buttonPanel, 1, 5);
-        layout.SetColumnSpan(buttonPanel, 3);
 
         AcceptButton = saveButton;
         CancelButton = cancelButton;
-        Controls.Add(layout);
+        return buttonPanel;
     }
 
     private static void AddSoundRow(
@@ -140,11 +318,31 @@ internal sealed class SettingsForm : Form
         connectedPathTextBox.Text = editSettings.ConnectedSoundPath;
         disconnectedPathTextBox.Text = editSettings.DisconnectedSoundPath;
         startWithWindowsCheckBox.Checked = editSettings.StartWithWindows;
+
+        LoadAlertValues(BatteryAlertKind.Low);
+        LoadAlertValues(BatteryAlertKind.Critical);
+        LoadAlertValues(BatteryAlertKind.Emergency);
+        LoadAlertValues(BatteryAlertKind.FullyCharged);
+    }
+
+    private void LoadAlertValues(BatteryAlertKind kind)
+    {
+        var settings = editSettings.GetBatteryAlert(kind);
+        var controls = alertControls[kind];
+
+        controls.EnabledCheckBox.Checked = settings.Enabled;
+        controls.PlaySoundCheckBox.Checked = settings.PlaySound;
+        controls.ShowNotificationCheckBox.Checked = settings.ShowNotification;
+        controls.SoundPathTextBox.Text = settings.SoundPath;
+        if (kind != BatteryAlertKind.FullyCharged)
+        {
+            controls.ThresholdNumericUpDown.Value = Math.Clamp(settings.ThresholdPercent, 1, 100);
+        }
     }
 
     private void BrowseConnectedSound(object? sender, EventArgs e)
     {
-        var path = ChooseSoundFile();
+        var path = ChooseAndCopySoundFile();
         if (path is not null)
         {
             connectedPathTextBox.Text = path;
@@ -153,24 +351,50 @@ internal sealed class SettingsForm : Form
 
     private void BrowseDisconnectedSound(object? sender, EventArgs e)
     {
-        var path = ChooseSoundFile();
+        var path = ChooseAndCopySoundFile();
         if (path is not null)
         {
             disconnectedPathTextBox.Text = path;
         }
     }
 
-    private static string? ChooseSoundFile()
+    private void BrowseBatteryAlertSound(BatteryAlertKind kind)
+    {
+        var path = ChooseAndCopySoundFile();
+        if (path is not null)
+        {
+            alertControls[kind].SoundPathTextBox.Text = path;
+        }
+    }
+
+    private static string? ChooseAndCopySoundFile()
     {
         using var dialog = new OpenFileDialog
         {
             Title = "Choose a sound file",
-            Filter = "Wave sound files (*.wav)|*.wav|All files (*.*)|*.*",
+            Filter = "Wave sound files (*.wav)|*.wav",
             CheckFileExists = true,
             Multiselect = false
         };
 
-        return dialog.ShowDialog() == DialogResult.OK ? dialog.FileName : null;
+        if (dialog.ShowDialog() != DialogResult.OK)
+        {
+            return null;
+        }
+
+        try
+        {
+            return SoundStorage.CopySoundToAppData(dialog.FileName);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"PowerSound could not copy the sound file.{Environment.NewLine}{ex.Message}",
+                "PowerSound",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+            return null;
+        }
     }
 
     private void TestConnectedSound(object? sender, EventArgs e)
@@ -183,6 +407,12 @@ internal sealed class SettingsForm : Form
     {
         ApplyValues(editSettings);
         previewSoundService.PlayDisconnectedSound();
+    }
+
+    private void TestBatteryAlertSound(BatteryAlertKind kind)
+    {
+        ApplyValues(editSettings);
+        previewSoundService.PlayBatteryAlertSound(kind);
     }
 
     private void SaveAndClose()
@@ -199,5 +429,34 @@ internal sealed class SettingsForm : Form
         target.ConnectedSoundPath = connectedPathTextBox.Text.Trim();
         target.DisconnectedSoundPath = disconnectedPathTextBox.Text.Trim();
         target.StartWithWindows = startWithWindowsCheckBox.Checked;
+
+        ApplyAlertValues(target, BatteryAlertKind.Low);
+        ApplyAlertValues(target, BatteryAlertKind.Critical);
+        ApplyAlertValues(target, BatteryAlertKind.Emergency);
+        ApplyAlertValues(target, BatteryAlertKind.FullyCharged);
+        target.EnsureDefaults();
+    }
+
+    private void ApplyAlertValues(PowerSoundSettings target, BatteryAlertKind kind)
+    {
+        var alertSettings = target.GetBatteryAlert(kind);
+        var controls = alertControls[kind];
+
+        alertSettings.Enabled = controls.EnabledCheckBox.Checked;
+        alertSettings.PlaySound = controls.PlaySoundCheckBox.Checked;
+        alertSettings.ShowNotification = controls.ShowNotificationCheckBox.Checked;
+        alertSettings.SoundPath = controls.SoundPathTextBox.Text.Trim();
+        alertSettings.ThresholdPercent = kind == BatteryAlertKind.FullyCharged
+            ? 100
+            : (int)controls.ThresholdNumericUpDown.Value;
+    }
+
+    private sealed class AlertControls
+    {
+        public CheckBox EnabledCheckBox { get; } = new();
+        public CheckBox PlaySoundCheckBox { get; } = new();
+        public CheckBox ShowNotificationCheckBox { get; } = new();
+        public TextBox SoundPathTextBox { get; } = new();
+        public NumericUpDown ThresholdNumericUpDown { get; } = new();
     }
 }

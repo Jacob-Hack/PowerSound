@@ -9,6 +9,8 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
     private readonly NotifyIcon notifyIcon;
     private readonly PowerSoundSettings settings;
     private readonly SoundService soundService;
+    private readonly BatteryAlertEvaluator batteryAlertEvaluator;
+    private readonly System.Windows.Forms.Timer batteryMonitorTimer;
     private SettingsForm? settingsForm;
     private PowerLineStatus lastPowerLineStatus;
 
@@ -17,6 +19,7 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
         settings = SettingsStore.Load();
         soundService = new SoundService(settings);
         lastPowerLineStatus = SystemInformation.PowerStatus.PowerLineStatus;
+        batteryAlertEvaluator = new BatteryAlertEvaluator(settings, lastPowerLineStatus);
 
         notifyIcon = new NotifyIcon
         {
@@ -28,6 +31,14 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
         notifyIcon.DoubleClick += (_, _) => ShowSettings();
 
         SystemEvents.PowerModeChanged += OnPowerModeChanged;
+
+        batteryMonitorTimer = new System.Windows.Forms.Timer
+        {
+            Interval = 60_000
+        };
+        batteryMonitorTimer.Tick += (_, _) => EvaluateBatteryAlerts();
+        batteryMonitorTimer.Start();
+        EvaluateBatteryAlerts();
     }
 
     private ContextMenuStrip BuildMenu()
@@ -43,6 +54,12 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
 
     private void OnPowerModeChanged(object sender, PowerModeChangedEventArgs e)
     {
+        if (e.Mode == PowerModes.Resume)
+        {
+            EvaluateBatteryAlerts();
+            return;
+        }
+
         if (e.Mode != PowerModes.StatusChange)
         {
             return;
@@ -65,6 +82,34 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
                 soundService.PlayDisconnectedSound();
                 break;
         }
+
+        EvaluateBatteryAlerts();
+    }
+
+    private void EvaluateBatteryAlerts()
+    {
+        var powerStatus = SystemInformation.PowerStatus;
+        var batteryPercent = (int)Math.Round(powerStatus.BatteryLifePercent * 100);
+        var alertEvent = batteryAlertEvaluator.Evaluate(batteryPercent, powerStatus.PowerLineStatus);
+        if (alertEvent is null)
+        {
+            return;
+        }
+
+        var alertSettings = settings.GetBatteryAlert(alertEvent.Kind);
+        if (alertSettings.PlaySound)
+        {
+            soundService.PlayBatteryAlertSound(alertEvent.Kind);
+        }
+
+        if (alertSettings.ShowNotification)
+        {
+            notifyIcon.ShowBalloonTip(
+                10_000,
+                alertEvent.NotificationTitle,
+                alertEvent.NotificationText,
+                alertEvent.NotificationIcon);
+        }
     }
 
     private void ShowSettings()
@@ -83,6 +128,8 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
     protected override void ExitThreadCore()
     {
         SystemEvents.PowerModeChanged -= OnPowerModeChanged;
+        batteryMonitorTimer.Stop();
+        batteryMonitorTimer.Dispose();
         SettingsStore.Save(settings);
         StartupManager.SetStartWithWindows(settings.StartWithWindows);
         notifyIcon.Visible = false;

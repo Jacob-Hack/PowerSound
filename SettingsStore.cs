@@ -18,7 +18,9 @@ internal static class SettingsStore
             if (File.Exists(SettingsPath))
             {
                 var json = File.ReadAllText(SettingsPath);
-                return JsonSerializer.Deserialize<PowerSoundSettings>(json) ?? new PowerSoundSettings();
+                var settings = JsonSerializer.Deserialize<PowerSoundSettings>(json) ?? new PowerSoundSettings();
+                settings.EnsureDefaults();
+                return settings;
             }
         }
         catch
@@ -26,10 +28,12 @@ internal static class SettingsStore
             // Broken settings should not stop the tray app from opening.
         }
 
-        return new PowerSoundSettings
+        var defaultSettings = new PowerSoundSettings
         {
             StartWithWindows = StartupManager.IsStartWithWindowsEnabled()
         };
+        defaultSettings.EnsureDefaults();
+        return defaultSettings;
     }
 
     public static void Save(PowerSoundSettings settings)
