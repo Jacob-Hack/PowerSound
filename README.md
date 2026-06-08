@@ -21,7 +21,7 @@ Windows may show a SmartScreen warning because PowerSound is not code-signed.
 - Includes battery low, critical, emergency, and fully charged alerts.
 - Lets each battery alert play a sound, show a Windows notification, both, or neither.
 - Uses configurable battery thresholds for low, critical, and emergency alerts.
-- Includes two built-in default sounds.
+- Includes built-in default sounds for AC power changes and battery alerts.
 - Lets the user choose custom `.wav` files.
 - Includes test buttons for both sounds.
 - Saves settings to `%APPDATA%\PowerSound\settings.json`.

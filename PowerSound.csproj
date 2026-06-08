@@ -14,4 +14,8 @@
   <ItemGroup>
     <Compile Remove="Installer\**\*.cs" />
   </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Sounds\*.wav" />
+  </ItemGroup>
 </Project>
