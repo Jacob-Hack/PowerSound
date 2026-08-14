@@ -340,6 +340,15 @@ internal sealed class SettingsForm : Form
         };
         cancelButton.Click += (_, _) => Close();
 
+        var resetButton = new Button
+        {
+            Text = "Reset all &settings to defaults",
+            AutoSize = true,
+            AccessibleName = "Reset all settings to defaults",
+            AccessibleDescription = "Resets settings in this window to built-in defaults. Choose Save to keep the reset."
+        };
+        resetButton.Click += (_, _) => ResetAllSettingsToDefaults();
+
         var buttonPanel = new FlowLayoutPanel
         {
             FlowDirection = FlowDirection.RightToLeft,
@@ -348,6 +357,7 @@ internal sealed class SettingsForm : Form
         };
         buttonPanel.Controls.Add(saveButton);
         buttonPanel.Controls.Add(cancelButton);
+        buttonPanel.Controls.Add(resetButton);
 
         AcceptButton = saveButton;
         CancelButton = cancelButton;
@@ -508,6 +518,24 @@ internal sealed class SettingsForm : Form
         SettingsStore.Save(settings);
         StartupManager.SetStartWithWindows(settings.StartWithWindows);
         Close();
+    }
+
+    private void ResetAllSettingsToDefaults()
+    {
+        var result = MessageBox.Show(
+            this,
+            "Reset all PowerSound settings in this window to the built-in defaults? Choose Save to keep the reset.",
+            "Reset PowerSound settings",
+            MessageBoxButtons.YesNo,
+            MessageBoxIcon.Question);
+
+        if (result != DialogResult.Yes)
+        {
+            return;
+        }
+
+        editSettings.CopyFrom(PowerSoundSettings.CreateDefault());
+        LoadValues();
     }
 
     private async Task CheckForUpdatesAsync(Control owner)

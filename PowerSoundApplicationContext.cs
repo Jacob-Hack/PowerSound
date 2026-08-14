@@ -61,8 +61,6 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
     {
         var menu = new ContextMenuStrip();
         menu.Items.Add("Open PowerSound settings", null, (_, _) => ShowSettings());
-        menu.Items.Add("Test AC connected sound", null, (_, _) => soundService.PlayConnectedSound());
-        menu.Items.Add("Test AC disconnected sound", null, (_, _) => soundService.PlayDisconnectedSound());
         menu.Items.Add("Check for updates", null, async (_, _) => await CheckForUpdatesAsync(showUpToDateMessage: true));
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("Exit", null, (_, _) => ExitThread());

@@ -14,6 +14,15 @@ internal sealed class PowerSoundSettings
     public bool UseDefaultConnectedSound => string.IsNullOrWhiteSpace(ConnectedSoundPath);
     public bool UseDefaultDisconnectedSound => string.IsNullOrWhiteSpace(DisconnectedSoundPath);
 
+    public static PowerSoundSettings CreateDefault() => new()
+    {
+        CheckForUpdatesOnStartup = true,
+        LowBatteryAlert = BatteryAlertSettings.CreateDefault(BatteryAlertKind.Low),
+        CriticalBatteryAlert = BatteryAlertSettings.CreateDefault(BatteryAlertKind.Critical),
+        EmergencyBatteryAlert = BatteryAlertSettings.CreateDefault(BatteryAlertKind.Emergency),
+        FullyChargedBatteryAlert = BatteryAlertSettings.CreateDefault(BatteryAlertKind.FullyCharged)
+    };
+
     public PowerSoundSettings Copy() => new()
     {
         ConnectedSoundPath = ConnectedSoundPath,

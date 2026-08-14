@@ -28,10 +28,8 @@ internal static class SettingsStore
             // Broken settings should not stop the tray app from opening.
         }
 
-        var defaultSettings = new PowerSoundSettings
-        {
-            StartWithWindows = StartupManager.IsStartWithWindowsEnabled()
-        };
+        var defaultSettings = PowerSoundSettings.CreateDefault();
+        defaultSettings.StartWithWindows = StartupManager.IsStartWithWindowsEnabled();
         defaultSettings.EnsureDefaults();
         return defaultSettings;
     }
