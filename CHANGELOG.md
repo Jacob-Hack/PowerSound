@@ -4,6 +4,8 @@ Notable changes to PowerSound are documented here.
 
 ## Unreleased
 
+## v0.2.4
+
 ### Fixed
 
 - Fixed Start with Windows becoming out of sync when saved settings are enabled but the Windows startup entry is missing or broken.

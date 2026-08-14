@@ -10,7 +10,7 @@
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <AssemblyName>PowerSound</AssemblyName>
     <RootNamespace>PowerSound</RootNamespace>
-    <Version>0.2.3</Version>
+    <Version>0.2.4</Version>
     <Product>PowerSound</Product>
     <Description>Power-related sounds and notifications for Windows.</Description>
     <Company>PowerSound Project</Company>
