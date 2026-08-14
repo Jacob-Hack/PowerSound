@@ -1,8 +1,14 @@
 # PowerSound
 
-PowerSound is a lightweight Windows 11 tray app that adds customizable sounds and optional notifications for charger and battery events.
+PowerSound is a lightweight Windows tray app that adds customizable sounds and optional notifications for charger and battery events.
 
 Created by Jacob Hack.
+
+## System requirements
+
+PowerSound is intended for **64-bit Windows 10 and Windows 11**.
+
+PowerSound has been tested on **Windows 11**. Windows 10 should also work, but has not yet been tested.
 
 ## Download
 
@@ -10,7 +16,7 @@ For most users, download and run:
 
 **[PowerSound-Setup.exe](https://github.com/Jacob-Hack/PowerSound/releases/latest/download/PowerSound-Setup.exe)**
 
-PowerSound installs to the normal Windows Program Files location and includes everything needed to run.
+PowerSound installs to the normal Windows Program Files location.
 
 Prefer not to install it? A portable ZIP is also available on the [latest release page](https://github.com/Jacob-Hack/PowerSound/releases/latest).
 
