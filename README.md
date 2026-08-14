@@ -8,7 +8,7 @@ Download the latest release from:
 
 https://github.com/Jacob-Hack/PowerSound/releases
 
-Most people should download `PowerSound-Setup.exe` and run it.
+Most people should download `PowerSound-Setup.exe` and run it. The installer uses the normal Windows Program Files location and may ask for administrator permission.
 
 Optional portable version: advanced users can download `PowerSound-Portable.zip`, unzip it, and run `PowerSound.exe` without installing.
 
@@ -41,6 +41,10 @@ PowerSound includes these battery alerts:
 Each battery alert can independently play a sound and show a Windows notification. Notifications are shown through the standard Windows notification area and follow Windows notification behavior, including Focus Assist / Do Not Disturb.
 
 Low, Critical, and Emergency alerts trigger once when the battery crosses down to the configured threshold. They reset after the battery rises above the configured threshold or AC power is connected. If Windows reports a large battery change, such as after waking from sleep below multiple thresholds, PowerSound shows only the most severe matching alert.
+
+## Sound credits
+
+The bundled default sounds were generated with Seed Audio 1.0 (Text to Audio) API on fal.
 
 ## Build
 

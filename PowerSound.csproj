@@ -9,6 +9,12 @@
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <AssemblyName>PowerSound</AssemblyName>
     <RootNamespace>PowerSound</RootNamespace>
+    <Product>PowerSound</Product>
+    <Description>Power-related sounds and notifications for Windows.</Description>
+    <Company>PowerSound Project</Company>
+    <Authors>PowerSound Project</Authors>
+    <RepositoryUrl>https://github.com/Jacob-Hack/PowerSound</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Jacob-Hack/PowerSound</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

@@ -2,8 +2,8 @@ namespace PowerSound;
 
 internal static class DefaultSounds
 {
-    public static byte[] Connected => LoadEmbeddedSound("ac_connected.wav");
-    public static byte[] Disconnected => LoadEmbeddedSound("ac_disconnected.wav");
+    public static byte[] Connected => LoadEmbeddedSound("ac_power_connected.wav");
+    public static byte[] Disconnected => LoadEmbeddedSound("ac_power_disconnected.wav");
     public static byte[] BatteryLow => LoadEmbeddedSound("battery_low.wav");
     public static byte[] BatteryCritical => LoadEmbeddedSound("battery_critical.wav");
     public static byte[] BatteryEmergency => LoadEmbeddedSound("battery_emergency.wav");
