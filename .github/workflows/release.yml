@@ -84,11 +84,17 @@ jobs:
           tag_name: ${{ env.RELEASE_VERSION }}
           name: PowerSound ${{ env.RELEASE_VERSION }}
           body: |
-            Recommended: download `PowerSound-Setup.exe` and run it.
+            PowerSound adds customizable sounds and optional notifications for charger and battery events on Windows.
 
-            Optional portable version: advanced users can download `PowerSound-Portable.zip`, unzip it, and run `PowerSound.exe` without installing.
+            ## Download
 
-            No .NET SDK or runtime install is needed for either option. Windows may show a SmartScreen warning because PowerSound is not code-signed.
+            For most users, download and run `PowerSound-Setup.exe`.
+
+            Prefer not to install it? Download `PowerSound-Portable.zip`, unzip it, and run `PowerSound.exe`.
+
+            Everything needed to run PowerSound is included.
+
+            Windows may show a SmartScreen warning because PowerSound is not digitally signed yet.
           files: |
             artifacts/PowerSound-Setup.exe
             artifacts/PowerSound-Portable.zip
