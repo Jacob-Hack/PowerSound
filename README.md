@@ -44,7 +44,7 @@ Low, Critical, and Emergency alerts trigger once when the battery crosses down t
 
 ## Sound credits
 
-The bundled default sounds were generated with Seed Audio 1.0 (Text to Audio) API on fal.
+The bundled default sounds were generated using ByteDance Seed Audio 1.0 via fal.ai.
 
 ## Build
 
