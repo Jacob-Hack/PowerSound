@@ -70,6 +70,40 @@ jobs:
         run: |
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" Installer/PowerSound.iss
 
+      - name: Prepare release notes
+        shell: pwsh
+        run: |
+          $version = $env:RELEASE_VERSION
+          $escapedVersion = [regex]::Escape($version)
+          $changelog = Get-Content -Raw -Path CHANGELOG.md
+          $pattern = "(?ms)^##\s+$escapedVersion\s*\r?\n(?<body>.*?)(?=^##\s+|\z)"
+          $match = [regex]::Match($changelog, $pattern)
+
+          if ($match.Success) {
+            $whatsNew = $match.Groups["body"].Value.Trim()
+          } else {
+            $whatsNew = "- See the commit history for changes in this release."
+          }
+
+          $releaseNotes = @"
+          PowerSound adds customizable sounds and optional notifications for charger and battery events on Windows.
+
+          ## What's New
+
+          $whatsNew
+
+          ## Download
+
+          For most users, download and run ``PowerSound-Setup.exe``.
+
+          Prefer not to install it? Download ``PowerSound-Portable.zip``, unzip it, and run ``PowerSound.exe``.
+
+          Windows may show a SmartScreen warning because PowerSound is not digitally signed yet.
+          "@
+
+          $releaseNotes = $releaseNotes -replace "(?m)^          ", ""
+          Set-Content -Path RELEASE_NOTES.md -Value $releaseNotes -Encoding utf8
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -83,16 +117,7 @@ jobs:
         with:
           tag_name: ${{ env.RELEASE_VERSION }}
           name: PowerSound ${{ env.RELEASE_VERSION }}
-          body: |
-            PowerSound adds customizable sounds and optional notifications for charger and battery events on Windows.
-
-            ## Download
-
-            For most users, download and run `PowerSound-Setup.exe`.
-
-            Prefer not to install it? Download `PowerSound-Portable.zip`, unzip it, and run `PowerSound.exe`.
-
-            Windows may show a SmartScreen warning because PowerSound is not digitally signed yet.
+          body_path: RELEASE_NOTES.md
           files: |
             artifacts/PowerSound-Setup.exe
             artifacts/PowerSound-Portable.zip

@@ -50,6 +50,10 @@ After installation, PowerSound runs in the Windows notification area. Double-cli
 
 Settings and custom sounds are stored under `%APPDATA%\PowerSound` so they remain separate from the installed program files.
 
+## Release history
+
+See [CHANGELOG.md](CHANGELOG.md) for notable changes in each release.
+
 ## Sound credits
 
 The bundled default sounds were generated using ByteDance Seed Audio 1.0 via fal.ai.
