@@ -10,6 +10,7 @@ Notable changes to PowerSound are documented here.
 
 ### Changed
 
+- PowerSound now starts with Windows by default on fresh installs. Users can turn this off in Settings.
 - Polished the README and download wording for casual users.
 - Improved the GitHub release description template for future releases.
 

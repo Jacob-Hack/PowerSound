@@ -4,7 +4,7 @@ internal sealed class PowerSoundSettings
 {
     public string ConnectedSoundPath { get; set; } = "";
     public string DisconnectedSoundPath { get; set; } = "";
-    public bool StartWithWindows { get; set; }
+    public bool StartWithWindows { get; set; } = true;
     public bool CheckForUpdatesOnStartup { get; set; } = true;
     public BatteryAlertSettings LowBatteryAlert { get; set; } = BatteryAlertSettings.CreateDefault(BatteryAlertKind.Low);
     public BatteryAlertSettings CriticalBatteryAlert { get; set; } = BatteryAlertSettings.CreateDefault(BatteryAlertKind.Critical);
@@ -16,6 +16,7 @@ internal sealed class PowerSoundSettings
 
     public static PowerSoundSettings CreateDefault() => new()
     {
+        StartWithWindows = true,
         CheckForUpdatesOnStartup = true,
         LowBatteryAlert = BatteryAlertSettings.CreateDefault(BatteryAlertKind.Low),
         CriticalBatteryAlert = BatteryAlertSettings.CreateDefault(BatteryAlertKind.Critical),

@@ -29,7 +29,6 @@ internal static class SettingsStore
         }
 
         var defaultSettings = PowerSoundSettings.CreateDefault();
-        defaultSettings.StartWithWindows = StartupManager.IsStartWithWindowsEnabled();
         defaultSettings.EnsureDefaults();
         return defaultSettings;
     }
