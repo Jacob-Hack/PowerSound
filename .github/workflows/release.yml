@@ -92,8 +92,6 @@ jobs:
 
             Prefer not to install it? Download `PowerSound-Portable.zip`, unzip it, and run `PowerSound.exe`.
 
-            Everything needed to run PowerSound is included.
-
             Windows may show a SmartScreen warning because PowerSound is not digitally signed yet.
           files: |
             artifacts/PowerSound-Setup.exe
