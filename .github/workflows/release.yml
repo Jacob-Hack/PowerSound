@@ -92,6 +92,12 @@ jobs:
 
           $whatsNew
 
+          ## System Requirements
+
+          PowerSound is intended for 64-bit Windows 10 and Windows 11.
+
+          PowerSound has been tested on Windows 11. Windows 10 should also work, but has not yet been tested.
+
           ## Download
 
           For most users, download and run ``PowerSound-Setup.exe``.
