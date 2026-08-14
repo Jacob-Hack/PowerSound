@@ -11,7 +11,13 @@ internal static class StartupManager
     public static bool IsStartWithWindowsEnabled()
     {
         using var key = Registry.CurrentUser.OpenSubKey(RunKeyPath, writable: false);
-        return key?.GetValue(AppName) is string value && value.Length > 0;
+        if (key?.GetValue(AppName) is not string value || string.IsNullOrWhiteSpace(value))
+        {
+            return false;
+        }
+
+        var startupPath = GetExecutablePathFromCommand(value);
+        return !string.IsNullOrWhiteSpace(startupPath) && File.Exists(startupPath);
     }
 
     public static void SetStartWithWindows(bool enabled)
@@ -35,5 +41,23 @@ internal static class StartupManager
         {
             key.SetValue(AppName, $"\"{exePath}\"");
         }
+    }
+
+    private static string? GetExecutablePathFromCommand(string command)
+    {
+        var trimmed = command.Trim();
+        if (trimmed.Length == 0)
+        {
+            return null;
+        }
+
+        if (trimmed[0] == '"')
+        {
+            var endQuote = trimmed.IndexOf('"', 1);
+            return endQuote > 1 ? trimmed[1..endQuote] : null;
+        }
+
+        var firstSpace = trimmed.IndexOf(' ');
+        return firstSpace > 0 ? trimmed[..firstSpace] : trimmed;
     }
 }

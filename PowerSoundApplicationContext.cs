@@ -19,6 +19,7 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
     public PowerSoundApplicationContext()
     {
         settings = SettingsStore.Load();
+        StartupManager.SetStartWithWindows(settings.StartWithWindows);
         soundService = new SoundService(settings);
         lastPowerLineStatus = SystemInformation.PowerStatus.PowerLineStatus;
         batteryAlertEvaluator = new BatteryAlertEvaluator(settings, lastPowerLineStatus);
