@@ -1,18 +1,18 @@
 # PowerSound
 
-PowerSound is a simple Windows 11 C#/.NET tray app for power-related sounds and notifications.
+PowerSound is a simple Windows 11 tray app that plays sounds and shows optional notifications for power events, like plugging in your charger, unplugging it, or reaching a low battery level.
 
 Created by Jacob Hack.
 
 ## Download
 
-Download the latest release from:
+Most people should download and run the installer:
 
-https://github.com/Jacob-Hack/PowerSound/releases
+**[Download PowerSound-Setup.exe](https://github.com/Jacob-Hack/PowerSound/releases/latest/download/PowerSound-Setup.exe)**
 
-Most people should download `PowerSound-Setup.exe` and run it. The installer uses the normal Windows Program Files location and may ask for administrator permission.
+The installer uses the normal Windows Program Files location and may ask for administrator permission.
 
-Optional portable version: advanced users can download `PowerSound-Portable.zip`, unzip it, and run `PowerSound.exe` without installing.
+Advanced users can also download the optional portable ZIP from the [latest release page](https://github.com/Jacob-Hack/PowerSound/releases/latest).
 
 Windows may show a SmartScreen warning because PowerSound is not code-signed.
 
@@ -26,7 +26,7 @@ Windows may show a SmartScreen warning because PowerSound is not code-signed.
 - Uses configurable battery thresholds for low, critical, and emergency alerts.
 - Includes built-in default sounds for AC power changes and battery alerts.
 - Lets the user choose custom `.wav` files.
-- Includes test buttons for both sounds.
+- Includes test buttons for each configurable sound.
 - Saves settings to `%APPDATA%\PowerSound\settings.json`.
 - Copies selected custom sounds to `%APPDATA%\PowerSound\Sounds` so they keep working if the original file moves.
 - Can start automatically with Windows through the current user's Run registry key.
@@ -81,4 +81,4 @@ GitHub Actions can also build the installer and optional portable ZIP automatica
 
 ## Use
 
-Run `PowerSound.exe`. Double-click the tray icon or open its tray menu to change settings, test sounds, or exit.
+After installing, PowerSound runs from the Windows tray. Double-click the tray icon or open its tray menu to change settings, test sounds, check for updates, or exit.
