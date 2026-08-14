@@ -28,12 +28,15 @@ internal static class UpdateService
 
         var releasePage = root.GetProperty("html_url").GetString();
         var installerUrl = FindInstallerUrl(root);
+        var releaseNotes = root.TryGetProperty("body", out var body)
+            ? body.GetString() ?? string.Empty
+            : string.Empty;
         if (string.IsNullOrWhiteSpace(releasePage) || string.IsNullOrWhiteSpace(installerUrl))
         {
             return null;
         }
 
-        return new UpdateInfo(tagName, latestVersion, new Uri(releasePage), new Uri(installerUrl));
+        return new UpdateInfo(tagName, latestVersion, new Uri(releasePage), new Uri(installerUrl), releaseNotes);
     }
 
     public static async Task<string> DownloadInstallerAsync(UpdateInfo updateInfo, CancellationToken cancellationToken = default)
@@ -65,6 +68,15 @@ internal static class UpdateService
         Process.Start(new ProcessStartInfo
         {
             FileName = "https://github.com/Jacob-Hack/PowerSound/releases",
+            UseShellExecute = true
+        });
+    }
+
+    public static void OpenReleasePage(UpdateInfo updateInfo)
+    {
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = updateInfo.ReleasePageUri.ToString(),
             UseShellExecute = true
         });
     }

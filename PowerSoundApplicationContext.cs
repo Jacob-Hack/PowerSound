@@ -11,7 +11,9 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
     private readonly SoundService soundService;
     private readonly BatteryAlertEvaluator batteryAlertEvaluator;
     private readonly System.Windows.Forms.Timer batteryMonitorTimer;
+    private readonly System.Windows.Forms.Timer startupUpdateTimer;
     private SettingsForm? settingsForm;
+    private bool checkingForUpdates;
     private PowerLineStatus lastPowerLineStatus;
 
     public PowerSoundApplicationContext()
@@ -39,6 +41,20 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
         batteryMonitorTimer.Tick += (_, _) => EvaluateBatteryAlerts();
         batteryMonitorTimer.Start();
         EvaluateBatteryAlerts();
+
+        startupUpdateTimer = new System.Windows.Forms.Timer
+        {
+            Interval = 8_000
+        };
+        startupUpdateTimer.Tick += async (_, _) =>
+        {
+            startupUpdateTimer.Stop();
+            if (settings.CheckForUpdatesOnStartup)
+            {
+                await CheckForUpdatesAsync(showUpToDateMessage: false);
+            }
+        };
+        startupUpdateTimer.Start();
     }
 
     private ContextMenuStrip BuildMenu()
@@ -47,7 +63,7 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
         menu.Items.Add("Open PowerSound settings", null, (_, _) => ShowSettings());
         menu.Items.Add("Test AC connected sound", null, (_, _) => soundService.PlayConnectedSound());
         menu.Items.Add("Test AC disconnected sound", null, (_, _) => soundService.PlayDisconnectedSound());
-        menu.Items.Add("Check for updates", null, async (_, _) => await CheckForUpdatesAsync());
+        menu.Items.Add("Check for updates", null, async (_, _) => await CheckForUpdatesAsync(showUpToDateMessage: true));
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("Exit", null, (_, _) => ExitThread());
         return menu;
@@ -126,28 +142,33 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
         settingsForm.Show();
     }
 
-    private async Task CheckForUpdatesAsync()
+    private async Task CheckForUpdatesAsync(bool showUpToDateMessage)
     {
+        if (checkingForUpdates)
+        {
+            return;
+        }
+
+        checkingForUpdates = true;
         try
         {
             var update = await UpdateService.CheckForUpdateAsync();
             if (update is null)
             {
-                MessageBox.Show(
-                    "PowerSound is up to date.",
-                    "PowerSound",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
+                if (showUpToDateMessage)
+                {
+                    MessageBox.Show(
+                        "PowerSound is up to date.",
+                        "PowerSound",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                }
                 return;
             }
 
-            var result = MessageBox.Show(
-                $"PowerSound {update.VersionText} is available.{Environment.NewLine}{Environment.NewLine}Download and run the installer now?",
-                "PowerSound update available",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Information);
-
-            if (result != DialogResult.Yes)
+            using var prompt = new UpdatePromptForm(update);
+            prompt.ShowDialog();
+            if (!prompt.InstallUpdate)
             {
                 return;
             }
@@ -164,6 +185,10 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
         }
+        finally
+        {
+            checkingForUpdates = false;
+        }
     }
 
     protected override void ExitThreadCore()
@@ -171,6 +196,8 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
         SystemEvents.PowerModeChanged -= OnPowerModeChanged;
         batteryMonitorTimer.Stop();
         batteryMonitorTimer.Dispose();
+        startupUpdateTimer.Stop();
+        startupUpdateTimer.Dispose();
         SettingsStore.Save(settings);
         StartupManager.SetStartWithWindows(settings.StartWithWindows);
         notifyIcon.Visible = false;

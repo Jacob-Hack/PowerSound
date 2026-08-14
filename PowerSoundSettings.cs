@@ -5,6 +5,7 @@ internal sealed class PowerSoundSettings
     public string ConnectedSoundPath { get; set; } = "";
     public string DisconnectedSoundPath { get; set; } = "";
     public bool StartWithWindows { get; set; }
+    public bool CheckForUpdatesOnStartup { get; set; } = true;
     public BatteryAlertSettings LowBatteryAlert { get; set; } = BatteryAlertSettings.CreateDefault(BatteryAlertKind.Low);
     public BatteryAlertSettings CriticalBatteryAlert { get; set; } = BatteryAlertSettings.CreateDefault(BatteryAlertKind.Critical);
     public BatteryAlertSettings EmergencyBatteryAlert { get; set; } = BatteryAlertSettings.CreateDefault(BatteryAlertKind.Emergency);
@@ -18,6 +19,7 @@ internal sealed class PowerSoundSettings
         ConnectedSoundPath = ConnectedSoundPath,
         DisconnectedSoundPath = DisconnectedSoundPath,
         StartWithWindows = StartWithWindows,
+        CheckForUpdatesOnStartup = CheckForUpdatesOnStartup,
         LowBatteryAlert = LowBatteryAlert.Copy(),
         CriticalBatteryAlert = CriticalBatteryAlert.Copy(),
         EmergencyBatteryAlert = EmergencyBatteryAlert.Copy(),
@@ -29,6 +31,7 @@ internal sealed class PowerSoundSettings
         ConnectedSoundPath = source.ConnectedSoundPath;
         DisconnectedSoundPath = source.DisconnectedSoundPath;
         StartWithWindows = source.StartWithWindows;
+        CheckForUpdatesOnStartup = source.CheckForUpdatesOnStartup;
         LowBatteryAlert.CopyFrom(source.LowBatteryAlert);
         CriticalBatteryAlert.CopyFrom(source.CriticalBatteryAlert);
         EmergencyBatteryAlert.CopyFrom(source.EmergencyBatteryAlert);

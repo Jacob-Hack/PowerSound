@@ -4,4 +4,5 @@ internal sealed record UpdateInfo(
     string VersionText,
     Version Version,
     Uri ReleasePageUri,
-    Uri InstallerUri);
+    Uri InstallerUri,
+    string ReleaseNotes);

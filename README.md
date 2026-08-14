@@ -30,7 +30,7 @@ Windows may show a SmartScreen warning because PowerSound is not code-signed.
 - Saves settings to `%APPDATA%\PowerSound\settings.json`.
 - Copies selected custom sounds to `%APPDATA%\PowerSound\Sounds` so they keep working if the original file moves.
 - Can start automatically with Windows through the current user's Run registry key.
-- Can check GitHub Releases for updates and launch the latest installer.
+- Can check GitHub Releases for updates on startup or on demand, show release notes, and launch the latest installer.
 - Uses standard Windows controls with labels, keyboard access keys, and accessibility names for screen readers.
 
 ## Battery alerts

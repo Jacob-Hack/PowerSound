@@ -11,6 +11,7 @@ internal sealed class SettingsForm : Form
     private readonly TextBox connectedPathTextBox = new();
     private readonly TextBox disconnectedPathTextBox = new();
     private readonly CheckBox startWithWindowsCheckBox = new();
+    private readonly CheckBox checkForUpdatesOnStartupCheckBox = new();
     private readonly Dictionary<BatteryAlertKind, AlertControls> alertControls = [];
 
     public SettingsForm(PowerSoundSettings settings)
@@ -71,7 +72,7 @@ internal sealed class SettingsForm : Form
             Dock = DockStyle.Fill,
             Padding = new Padding(12),
             ColumnCount = 4,
-            RowCount = 4
+            RowCount = 5
         };
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 170));
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
@@ -87,6 +88,13 @@ internal sealed class SettingsForm : Form
         startWithWindowsCheckBox.AccessibleDescription = "When checked, PowerSound opens automatically after you sign in.";
         layout.Controls.Add(startWithWindowsCheckBox, 1, 3);
         layout.SetColumnSpan(startWithWindowsCheckBox, 3);
+
+        checkForUpdatesOnStartupCheckBox.Text = "Check for &updates when PowerSound starts";
+        checkForUpdatesOnStartupCheckBox.AutoSize = true;
+        checkForUpdatesOnStartupCheckBox.AccessibleName = "Check for updates when PowerSound starts";
+        checkForUpdatesOnStartupCheckBox.AccessibleDescription = "When checked, PowerSound checks GitHub Releases for a newer version shortly after launch.";
+        layout.Controls.Add(checkForUpdatesOnStartupCheckBox, 1, 4);
+        layout.SetColumnSpan(checkForUpdatesOnStartupCheckBox, 3);
 
         tab.Controls.Add(layout);
         return tab;
@@ -395,6 +403,7 @@ internal sealed class SettingsForm : Form
         connectedPathTextBox.Text = editSettings.ConnectedSoundPath;
         disconnectedPathTextBox.Text = editSettings.DisconnectedSoundPath;
         startWithWindowsCheckBox.Checked = editSettings.StartWithWindows;
+        checkForUpdatesOnStartupCheckBox.Checked = editSettings.CheckForUpdatesOnStartup;
 
         LoadAlertValues(BatteryAlertKind.Low);
         LoadAlertValues(BatteryAlertKind.Critical);
@@ -518,14 +527,9 @@ internal sealed class SettingsForm : Form
                 return;
             }
 
-            var result = MessageBox.Show(
-                this,
-                $"PowerSound {update.VersionText} is available.{Environment.NewLine}{Environment.NewLine}Download and run the installer now?",
-                "PowerSound update available",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Information);
-
-            if (result != DialogResult.Yes)
+            using var prompt = new UpdatePromptForm(update);
+            prompt.ShowDialog(this);
+            if (!prompt.InstallUpdate)
             {
                 return;
             }
@@ -557,6 +561,7 @@ internal sealed class SettingsForm : Form
         target.ConnectedSoundPath = connectedPathTextBox.Text.Trim();
         target.DisconnectedSoundPath = disconnectedPathTextBox.Text.Trim();
         target.StartWithWindows = startWithWindowsCheckBox.Checked;
+        target.CheckForUpdatesOnStartup = checkForUpdatesOnStartupCheckBox.Checked;
 
         ApplyAlertValues(target, BatteryAlertKind.Low);
         ApplyAlertValues(target, BatteryAlertKind.Critical);
