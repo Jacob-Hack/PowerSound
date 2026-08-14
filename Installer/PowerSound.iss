@@ -21,6 +21,7 @@ AppSupportURL=https://github.com/Jacob-Hack/PowerSound/issues
 AppUpdatesURL=https://github.com/Jacob-Hack/PowerSound/releases
 OutputDir={#OutputDir}
 OutputBaseFilename=PowerSound-Setup
+SetupIconFile=..\Assets\PowerSound.ico
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern

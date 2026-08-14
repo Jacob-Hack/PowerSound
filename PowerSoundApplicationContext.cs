@@ -23,7 +23,7 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
 
         notifyIcon = new NotifyIcon
         {
-            Icon = SystemIcons.Shield,
+            Icon = AppIcons.CreateApplicationIcon(),
             Text = "PowerSound",
             Visible = true,
             ContextMenuStrip = BuildMenu()
@@ -47,6 +47,7 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
         menu.Items.Add("Open PowerSound settings", null, (_, _) => ShowSettings());
         menu.Items.Add("Test AC connected sound", null, (_, _) => soundService.PlayConnectedSound());
         menu.Items.Add("Test AC disconnected sound", null, (_, _) => soundService.PlayDisconnectedSound());
+        menu.Items.Add("Check for updates", null, async (_, _) => await CheckForUpdatesAsync());
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("Exit", null, (_, _) => ExitThread());
         return menu;
@@ -123,6 +124,46 @@ internal sealed class PowerSoundApplicationContext : ApplicationContext
         settingsForm = new SettingsForm(settings);
         settingsForm.FormClosed += (_, _) => settingsForm = null;
         settingsForm.Show();
+    }
+
+    private async Task CheckForUpdatesAsync()
+    {
+        try
+        {
+            var update = await UpdateService.CheckForUpdateAsync();
+            if (update is null)
+            {
+                MessageBox.Show(
+                    "PowerSound is up to date.",
+                    "PowerSound",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            var result = MessageBox.Show(
+                $"PowerSound {update.VersionText} is available.{Environment.NewLine}{Environment.NewLine}Download and run the installer now?",
+                "PowerSound update available",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Information);
+
+            if (result != DialogResult.Yes)
+            {
+                return;
+            }
+
+            var installerPath = await UpdateService.DownloadInstallerAsync(update);
+            UpdateService.LaunchInstaller(installerPath);
+            ExitThread();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"PowerSound could not check for updates.{Environment.NewLine}{ex.Message}",
+                "PowerSound",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+        }
     }
 
     protected override void ExitThreadCore()

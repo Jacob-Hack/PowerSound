@@ -27,6 +27,7 @@ internal sealed class SettingsForm : Form
         AutoScaleMode = AutoScaleMode.Font;
         AccessibleName = "PowerSound settings";
         AccessibleDescription = "Choose power sounds, battery alerts, notifications, and startup behavior.";
+        Icon = AppIcons.CreateApplicationIcon();
 
         BuildUi();
         LoadValues();
@@ -51,6 +52,7 @@ internal sealed class SettingsForm : Form
         };
         tabs.TabPages.Add(BuildGeneralTab());
         tabs.TabPages.Add(BuildBatteryAlertsTab());
+        tabs.TabPages.Add(BuildAboutTab());
         mainLayout.Controls.Add(tabs, 0, 0);
 
         mainLayout.Controls.Add(BuildButtonPanel(), 0, 1);
@@ -85,6 +87,81 @@ internal sealed class SettingsForm : Form
         startWithWindowsCheckBox.AccessibleDescription = "When checked, PowerSound opens automatically after you sign in.";
         layout.Controls.Add(startWithWindowsCheckBox, 1, 3);
         layout.SetColumnSpan(startWithWindowsCheckBox, 3);
+
+        tab.Controls.Add(layout);
+        return tab;
+    }
+
+    private TabPage BuildAboutTab()
+    {
+        var tab = new TabPage("About")
+        {
+            AccessibleName = "About PowerSound"
+        };
+
+        var layout = new TableLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            Padding = new Padding(12),
+            ColumnCount = 1,
+            RowCount = 7
+        };
+        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+
+        var nameLabel = new Label
+        {
+            Text = "PowerSound",
+            AutoSize = true,
+            Font = new Font(Font, FontStyle.Bold),
+            AccessibleName = "PowerSound"
+        };
+        layout.Controls.Add(nameLabel, 0, 0);
+
+        layout.Controls.Add(new Label
+        {
+            Text = $"Version {AppVersion.Display}",
+            AutoSize = true,
+            AccessibleName = $"PowerSound version {AppVersion.Display}"
+        }, 0, 1);
+
+        layout.Controls.Add(new Label
+        {
+            Text = "Created by Jacob Hack.",
+            AutoSize = true
+        }, 0, 2);
+
+        layout.Controls.Add(new Label
+        {
+            Text = "Bundled default sounds generated using ByteDance Seed Audio 1.0 via fal.ai.",
+            AutoSize = true
+        }, 0, 3);
+
+        var checkUpdatesButton = new Button
+        {
+            Text = "Check for &updates",
+            AutoSize = true,
+            Anchor = AnchorStyles.Left,
+            AccessibleName = "Check for updates",
+            AccessibleDescription = "Checks GitHub Releases for a newer PowerSound installer."
+        };
+        checkUpdatesButton.Click += async (_, _) => await CheckForUpdatesAsync(checkUpdatesButton);
+        layout.Controls.Add(checkUpdatesButton, 0, 4);
+
+        var releasesButton = new Button
+        {
+            Text = "Open &releases page",
+            AutoSize = true,
+            Anchor = AnchorStyles.Left,
+            AccessibleName = "Open releases page"
+        };
+        releasesButton.Click += (_, _) => UpdateService.OpenReleasesPage();
+        layout.Controls.Add(releasesButton, 0, 5);
 
         tab.Controls.Add(layout);
         return tab;
@@ -422,6 +499,57 @@ internal sealed class SettingsForm : Form
         SettingsStore.Save(settings);
         StartupManager.SetStartWithWindows(settings.StartWithWindows);
         Close();
+    }
+
+    private async Task CheckForUpdatesAsync(Control owner)
+    {
+        owner.Enabled = false;
+        try
+        {
+            var update = await UpdateService.CheckForUpdateAsync();
+            if (update is null)
+            {
+                MessageBox.Show(
+                    this,
+                    "PowerSound is up to date.",
+                    "PowerSound",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            var result = MessageBox.Show(
+                this,
+                $"PowerSound {update.VersionText} is available.{Environment.NewLine}{Environment.NewLine}Download and run the installer now?",
+                "PowerSound update available",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Information);
+
+            if (result != DialogResult.Yes)
+            {
+                return;
+            }
+
+            var installerPath = await UpdateService.DownloadInstallerAsync(update);
+            UpdateService.LaunchInstaller(installerPath);
+            Application.Exit();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                this,
+                $"PowerSound could not check for updates.{Environment.NewLine}{ex.Message}",
+                "PowerSound",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+        }
+        finally
+        {
+            if (!owner.IsDisposed)
+            {
+                owner.Enabled = true;
+            }
+        }
     }
 
     private void ApplyValues(PowerSoundSettings target)

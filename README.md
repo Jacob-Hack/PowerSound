@@ -19,6 +19,7 @@ Windows may show a SmartScreen warning because PowerSound is not code-signed.
 ## Features
 
 - Runs as a tray app.
+- Uses a custom PowerSound app, tray, and installer icon.
 - Detects AC power connect and disconnect events.
 - Includes battery low, critical, emergency, and fully charged alerts.
 - Lets each battery alert play a sound, show a Windows notification, both, or neither.
@@ -29,6 +30,7 @@ Windows may show a SmartScreen warning because PowerSound is not code-signed.
 - Saves settings to `%APPDATA%\PowerSound\settings.json`.
 - Copies selected custom sounds to `%APPDATA%\PowerSound\Sounds` so they keep working if the original file moves.
 - Can start automatically with Windows through the current user's Run registry key.
+- Can check GitHub Releases for updates and launch the latest installer.
 - Uses standard Windows controls with labels, keyboard access keys, and accessibility names for screen readers.
 
 ## Battery alerts

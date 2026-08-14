@@ -6,15 +6,18 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\PowerSound.ico</ApplicationIcon>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <AssemblyName>PowerSound</AssemblyName>
     <RootNamespace>PowerSound</RootNamespace>
+    <Version>0.2.1</Version>
     <Product>PowerSound</Product>
     <Description>Power-related sounds and notifications for Windows.</Description>
     <Company>PowerSound Project</Company>
     <Authors>PowerSound Project</Authors>
     <RepositoryUrl>https://github.com/Jacob-Hack/PowerSound</RepositoryUrl>
     <PackageProjectUrl>https://github.com/Jacob-Hack/PowerSound</PackageProjectUrl>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,5 +26,6 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Assets\Sounds\*.wav" />
+    <EmbeddedResource Include="Assets\PowerSound.ico" />
   </ItemGroup>
 </Project>
