@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace PowerSound;
@@ -47,7 +48,7 @@ internal sealed class UpdatePromptForm : Form
         {
             Text = string.IsNullOrWhiteSpace(updateInfo.ReleaseNotes)
                 ? "No release notes were provided for this update."
-                : updateInfo.ReleaseNotes,
+                : FormatReleaseNotes(updateInfo.ReleaseNotes),
             Dock = DockStyle.Fill,
             Multiline = true,
             ReadOnly = true,
@@ -108,5 +109,21 @@ internal sealed class UpdatePromptForm : Form
         AcceptButton = installButton;
         CancelButton = laterButton;
         Controls.Add(layout);
+    }
+
+    private static string FormatReleaseNotes(string markdown)
+    {
+        var text = markdown.Replace("\r\n", "\n").Replace('\r', '\n').Trim();
+
+        text = Regex.Replace(text, @"`([^`\r\n]+)`", "$1");
+        text = Regex.Replace(text, @"\*\*([^*]+)\*\*", "$1");
+        text = Regex.Replace(text, @"__([^_]+)__", "$1");
+        text = Regex.Replace(text, @"\*([^*\r\n]+)\*", "$1");
+        text = Regex.Replace(text, @"_([^_\r\n]+)_", "$1");
+        text = Regex.Replace(text, @"^\s{0,3}#{1,6}\s*", "", RegexOptions.Multiline);
+        text = Regex.Replace(text, @"^\s*[-*+]\s+", "- ", RegexOptions.Multiline);
+        text = Regex.Replace(text, @"\n{3,}", "\n\n");
+
+        return text.Replace("\n", Environment.NewLine);
     }
 }
