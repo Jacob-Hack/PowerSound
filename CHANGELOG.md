@@ -4,6 +4,10 @@ Notable changes to PowerSound are documented here.
 
 ## Unreleased
 
+### Changed
+
+- Update prompts now show only the release's What's New notes instead of the full GitHub release page text.
+
 ## v0.2.4
 
 ### Fixed

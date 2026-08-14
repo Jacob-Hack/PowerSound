@@ -113,7 +113,7 @@ internal sealed class UpdatePromptForm : Form
 
     private static string FormatReleaseNotes(string markdown)
     {
-        var text = markdown.Replace("\r\n", "\n").Replace('\r', '\n').Trim();
+        var text = ExtractWhatsNew(markdown.Replace("\r\n", "\n").Replace('\r', '\n')).Trim();
 
         text = Regex.Replace(text, @"`([^`\r\n]+)`", "$1");
         text = Regex.Replace(text, @"\*\*([^*]+)\*\*", "$1");
@@ -125,5 +125,20 @@ internal sealed class UpdatePromptForm : Form
         text = Regex.Replace(text, @"\n{3,}", "\n\n");
 
         return text.Replace("\n", Environment.NewLine);
+    }
+
+    private static string ExtractWhatsNew(string markdown)
+    {
+        var match = Regex.Match(
+            markdown,
+            @"(?ims)^\s*##\s+What's New\s*(?:\n|$)(?<body>.*?)(?=^\s*##\s+\S|\z)");
+
+        if (!match.Success)
+        {
+            return markdown;
+        }
+
+        var body = match.Groups["body"].Value.Trim();
+        return string.IsNullOrWhiteSpace(body) ? markdown : body;
     }
 }
