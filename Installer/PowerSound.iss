@@ -45,5 +45,42 @@ Source: "{#SourceDir}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
+[InstallDelete]
+Type: files; Name: "{app}\{#MyAppExeName}"
+
+[UninstallDelete]
+Type: files; Name: "{app}\{#MyAppExeName}"
+
+[UninstallRun]
+Filename: "{cmd}"; Parameters: "/c taskkill /IM {#MyAppExeName} /F /T"; Flags: runhidden waituntilterminated; RunOnceId: "StopPowerSound"
+
+[Code]
+procedure StopPowerSound();
+var
+  ResultCode: Integer;
+begin
+  Exec(ExpandConstant('{cmd}'), '/c taskkill /IM {#MyAppExeName} /F /T', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+end;
+
+procedure DeleteStartupEntry();
+begin
+  RegDeleteValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Run', '{#MyAppName}');
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep = ssInstall then
+    StopPowerSound();
+end;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  if CurUninstallStep = usUninstall then
+  begin
+    StopPowerSound();
+    DeleteStartupEntry();
+  end;
+end;
+
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "Launch {#MyAppName}"; Flags: nowait postinstall skipifsilent
