@@ -10,7 +10,7 @@ https://github.com/Jacob-Hack/PowerSound/releases
 
 Most people should download `PowerSound-Setup.exe` and run it.
 
-For portable use, download `PowerSound-for-Windows.zip`, unzip it, and run `PowerSound.exe`.
+Optional portable version: advanced users can download `PowerSound-Portable.zip`, unzip it, and run `PowerSound.exe` without installing.
 
 Windows may show a SmartScreen warning because PowerSound is not code-signed.
 
@@ -69,7 +69,7 @@ dotnet publish PowerSound.csproj -c Release -r win-x64 --self-contained true /p:
 iscc Installer\PowerSound.iss
 ```
 
-GitHub Actions can also build the installer and portable ZIP automatically from the **Build release** workflow.
+GitHub Actions can also build the installer and optional portable ZIP automatically from the **Build release** workflow.
 
 ## Use
 
