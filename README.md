@@ -2,6 +2,8 @@
 
 PowerSound is a simple Windows 11 C#/.NET tray app for power-related sounds and notifications.
 
+Created by Jacob Hack.
+
 ## Download
 
 Download the latest release from:
