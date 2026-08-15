@@ -1,6 +1,8 @@
 # PowerSound
 
-PowerSound is a lightweight Windows tray app that adds customizable sounds and optional notifications for charger and battery events.
+PowerSound is a lightweight Windows tray app that plays customizable sounds when your computer is plugged into or unplugged from power.
+
+It also includes optional battery alerts, Windows notifications, customizable battery thresholds, and other power-related features.
 
 Created by Jacob Hack.
 
@@ -22,39 +24,45 @@ Prefer not to install it? A portable ZIP is also available on the [latest releas
 
 Windows may show a SmartScreen warning because PowerSound is not digitally signed yet.
 
-## Features
+## Core feature
 
-- Plays distinct sounds when AC power is connected or disconnected.
-- Includes Battery Low, Critical, Emergency, and Fully Charged alerts.
-- Lets each battery alert play a sound, show a Windows notification, or both.
-- Lets you customize Low, Critical, and Emergency battery thresholds.
-- Includes built-in default sounds, with support for custom `.wav` files.
-- Copies selected custom sounds into `%APPDATA%\PowerSound\Sounds` so they continue working if the original file is moved or deleted.
-- Includes test buttons for each configurable sound.
-- Can start automatically with Windows.
-- Can check for updates automatically at startup or manually from the tray menu and Settings.
-- Shows release notes before installing an update.
-- Includes a Reset All Settings option.
-- Uses standard Windows controls, keyboard navigation, and accessibility names for screen readers.
+PowerSound's main purpose is to provide immediate audio feedback when your computer's power connection changes.
 
-## Battery alerts
+- Plays a sound when AC power is connected.
+- Plays a different sound when AC power is disconnected.
+- Includes built-in sounds for both events.
+- Lets you replace either sound with your own `.wav` file.
+- Includes Test buttons so you can preview your selected sounds.
+- Copies custom sounds into `%APPDATA%\PowerSound\Sounds` so they continue working if the original file is moved or deleted.
 
-PowerSound includes four battery alerts:
+## Additional features
+
+### Battery alerts
+
+PowerSound can also alert you at important battery levels:
 
 - **Battery Low:** enabled by default at 20%.
 - **Battery Critical:** enabled by default at 10%.
 - **Battery Emergency:** enabled by default at 5%.
-- **Battery Fully Charged:** disabled by default and triggers at 100% while connected to AC power.
+- **Battery Fully Charged:** optional and disabled by default. Alerts at 100% while connected to power.
 
-Each alert can independently play a sound and show a Windows notification. Low, Critical, and Emergency alerts trigger once when the battery crosses the configured threshold and reset after the battery rises above that threshold or AC power is connected.
+Low, Critical, and Emergency thresholds can be customized.
+
+Each battery alert can play a sound, show a Windows notification, or both. Each alert can also use its own custom `.wav` sound.
+
+Low, Critical, and Emergency alerts trigger once when the battery reaches their configured threshold rather than repeating at every lower percentage. They reset after the battery rises above the threshold or AC power is connected.
+
+The Fully Charged alert triggers once per charge cycle.
 
 If Windows reports a large battery change, such as after waking from sleep below several thresholds, PowerSound uses only the most severe matching alert.
 
-## Using PowerSound
+### Startup and updates
 
-After installation, PowerSound runs in the Windows notification area. Double-click the tray icon or open its context menu to access Settings, Check for Updates, or Exit.
-
-Settings and custom sounds are stored under `%APPDATA%\PowerSound` so they remain separate from the installed program files.
+- PowerSound starts with Windows by default on fresh installs. This can be turned off in Settings.
+- Automatic update checking at startup is enabled by default.
+- You can manually check for updates at any time.
+- When an update is available, PowerSound shows the release notes and can download and launch the latest installer.
+- Settings can be reset to their defaults at any time.
 
 ## Release history
 
@@ -62,7 +70,7 @@ See [CHANGELOG.md](CHANGELOG.md) for notable changes in each release.
 
 ## Sound credits
 
-The bundled default sounds were generated using ByteDance Seed Audio 1.0 via fal.ai.
+The bundled default sounds were generated using ByteDance Seed Audio 1.0.
 
 ## Build from source
 
