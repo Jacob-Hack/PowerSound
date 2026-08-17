@@ -1,7 +1,7 @@
 #define MyAppName "PowerSound"
 #define MyAppVersion GetEnv("POWERSOUND_VERSION")
 #if MyAppVersion == ""
-  #define MyAppVersion "0.1.0"
+  #define MyAppVersion "1.0.0"
 #endif
 #define MyAppPublisher "PowerSound Project"
 #define MyAppExeName "PowerSound.exe"
